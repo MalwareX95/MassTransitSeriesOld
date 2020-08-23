@@ -19,10 +19,18 @@ namespace Sample.Components.Consumers
 
         public async Task Consume(ConsumeContext<SubmitOrder> context)
         {
-            logger.LogDebug("");
+            logger.LogDebug("SubmitOrderConsumer: {CustomerNumber}", context.Message.CustomerNumber);
             if (context.Message.CustomerNumber.Contains("TEST"))
             {
+                await context.RespondAsync<OrderSubmissionRejected>(new
+                {
+                    context.Message.OrderId,
+                    Timestamp = InVar.Timestamp,
+                    context.Message.CustomerNumber,
+                    Reason = $"Test Customer cannot submit orders: {context.Message.CustomerNumber}"
+                });
 
+                return;
             }
             await context.RespondAsync<OrderSubmissionAccepted>(new
             {
