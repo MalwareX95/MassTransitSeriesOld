@@ -36,13 +36,20 @@ namespace Sample.Components.Consumers
                 return;
             }
 
+            await context.Publish<OrderSubmitted>(new
+            {
+                context.Message.OrderId,
+                context.Message.CustomerNumber,
+                context.Message.Timestamp
+            });
+
             if (context.RequestId != null)
             {
                 await context.RespondAsync<OrderSubmissionAccepted>(new
                 {
                     context.Message.OrderId,
+                    context.Message.CustomerNumber,
                     Timestamp = InVar.Timestamp,
-                    context.Message.CustomerNumber
                 });
             }
         }
